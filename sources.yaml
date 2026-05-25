@@ -1,0 +1,82 @@
+# Source configuration for ai-digest.
+# Edit this file to add/remove sources. The ingestion pipeline reads it at runtime.
+# Source types: rss (feedparser) | html (httpx + listing parser)
+
+frontier_labs:
+  - name: Anthropic News
+    url: https://www.anthropic.com/news
+    type: html
+  - name: OpenAI Blog
+    url: https://openai.com/blog/rss.xml
+    type: rss
+  - name: Google DeepMind Blog
+    url: https://deepmind.google/discover/blog/
+    type: html
+  - name: Meta AI
+    url: https://ai.meta.com/blog/
+    type: html
+  - name: Mistral News
+    url: https://mistral.ai/news/
+    type: html
+  - name: AI2 Blog
+    url: https://allenai.org/blog
+    type: html
+  - name: xAI News
+    url: https://x.ai/news
+    type: html
+
+practitioners:
+  - name: Simon Willison
+    url: https://simonwillison.net/atom/everything/
+    type: rss
+  - name: One Useful Thing (Ethan Mollick)
+    url: https://www.oneusefulthing.org/feed
+    type: rss
+  - name: Interconnects (Nathan Lambert)
+    url: https://www.interconnects.ai/feed
+    type: rss
+  - name: Latent Space (Swyx)
+    url: https://www.latent.space/feed
+    type: rss
+  - name: Eugene Yan
+    url: https://eugeneyan.com/rss/
+    type: rss
+  - name: Hamel Husain
+    url: https://hamel.dev/index.xml
+    type: rss
+  - name: Jason Liu
+    url: https://jxnl.co/feeds/feed.xml
+    type: rss
+  - name: Sebastian Raschka — Ahead of AI
+    url: https://magazine.sebastianraschka.com/feed
+    type: rss
+  - name: Lilian Weng
+    url: https://lilianweng.github.io/index.xml
+    type: rss
+
+papers:
+  - name: HuggingFace Daily Papers
+    url: https://huggingface.co/papers
+    type: html
+  - name: arxiv-sanity top
+    url: https://arxiv-sanity-lite.com/?rank=time
+    type: html
+  - name: AlphaSignal
+    url: https://alphasignal.ai
+    type: html
+
+industry:
+  - name: TechCrunch AI
+    url: https://techcrunch.com/category/artificial-intelligence/feed/
+    type: rss
+  - name: The Verge AI
+    url: https://www.theverge.com/rss/ai-artificial-intelligence/index.xml
+    type: rss
+
+community_signals:
+  - name: HackerNews — AI-filtered top
+    url: https://hnrss.org/frontpage?q=AI+OR+LLM+OR+Claude+OR+GPT+OR+Anthropic+OR+OpenAI
+    type: rss
+  - name: GitHub trending — Python AI
+    url: https://github.com/trending/python?since=daily
+    type: html
