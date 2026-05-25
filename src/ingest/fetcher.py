@@ -164,15 +164,21 @@ def _parse_xai(html: str, base_url: str) -> list[str]:
 
 
 def _parse_hf_papers(html: str, base_url: str) -> list[str]:
-    """https://huggingface.co/papers/<arxiv_id>"""
-    return _extract_links(
-        html,
-        base_url,
-        lambda url: (
-            "huggingface.co/papers/" in url
-            and url.rstrip("/") != "https://huggingface.co/papers"
-        ),
-    )
+    """https://huggingface.co/papers/<arxiv_id> — arxiv IDs are purely numeric like 2605.12345."""
+    _HF_EXCLUDED = {"trending", "date", ""}
+
+    def _is_paper(url: str) -> bool:
+        if "huggingface.co/papers/" not in url:
+            return False
+        # Path segment after /papers/
+        path = urlparse(url).path  # e.g. /papers/2605.21573
+        slug = path.rstrip("/").split("/papers/", 1)[-1]
+        # Exclude listing slugs: trending, date/..., or empty
+        if not slug or slug.split("/")[0] in _HF_EXCLUDED:
+            return False
+        return True
+
+    return _extract_links(html, base_url, _is_paper)
 
 
 def _parse_arxiv_sanity(html: str, base_url: str) -> list[str]:
@@ -199,17 +205,34 @@ def _parse_alphasignal(html: str, base_url: str) -> list[str]:
 
 
 def _parse_github_trending(html: str, base_url: str) -> list[str]:
-    """GitHub trending repos — links like https://github.com/<user>/<repo>."""
+    """GitHub trending repos — links like https://github.com/<user>/<repo>.
+
+    GitHub has many reserved org-level paths that look like user/repo but aren't.
+    Filter them out with a known-reserved-prefix list.
+    """
+    # GitHub reserved first-path-segments (not usernames)
+    _GH_RESERVED = {
+        "trending", "features", "topics", "explore", "marketplace", "apps",
+        "resources", "solutions", "security", "enterprise", "sponsors",
+        "orgs", "collections", "events", "about", "contact", "pricing",
+        "organizations", "settings", "notifications", "login", "signup",
+        "pulls", "issues", "discussions", "codespaces", "actions",
+        "packages", "search", "new", "join", "dashboard",
+    }
 
     def _is_repo_link(url: str) -> bool:
         parsed = urlparse(url)
         if "github.com" not in parsed.netloc:
             return False
         parts = [p for p in parsed.path.strip("/").split("/") if p]
-        return (
-            len(parts) == 2
-            and parts[0] not in {"trending", "features", "topics", "explore"}
-        )
+        if len(parts) != 2:
+            return False
+        owner, repo = parts
+        # Both segments must look like valid GitHub slugs (no dots, not reserved)
+        if owner in _GH_RESERVED:
+            return False
+        # Repo names on the trending page are real slugs, not pages
+        return bool(repo) and "." not in owner
 
     return _extract_links(html, base_url, _is_repo_link)
 
